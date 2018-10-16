@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>关系图</title>
+  <link rel="stylesheet" href="../dist/re-graph.css">
+</head>
+<body>
+  <div id="mountNode"></div>
+  <script src="../dist/re-graph.js"></script>
+  <script>
+    //数据格式，可以使用ReGraph.Utils.formatData直接重定义格式
+    /*
+      {
+        nodes: [{
+          id, label, fields
+        }],
+        edges: [{
+          id, target, source, target_field, source_field
+        }],
+      }
+    */
+    const data = [{
+      "id": 1,
+      "target_table": "公司",
+      "target_table_id": 1,
+      "target_field": "id",
+      "source_table": "个人",
+      "source_field": "c_id",
+      "source_table_id": 2,
+    }, {
+      "id": 2,
+      "target_table": "公司",
+      "target_table_id": 1,
+      "target_field": "id",
+      "source_table": "资产",
+      "source_field": "c_id",
+      "source_table_id": 3,
+    }, {
+      "id": 3,
+      "target_table": "个人",
+      "target_table_id": 2,
+      "target_field": "id",
+      "source_table": "资产",
+      "source_field": "p_id",
+      "source_table_id": 3,
+    }]
+    const formattedData = ReGraph.Utils.formatData(data, {
+      id: 'id',
+      target: 'target_table_id',
+      target_name: 'target_table',
+      target_field: 'target_field',
+      source: 'source_table_id',
+      source_name: 'source_table',
+      source_field: 'source_field',
+    })
+    ReGraph.create({
+      container: 'mountNode',
+      height: 600,
+      width: 900,
+      data: formattedData,
+      minimapCfg: {
+        container: 'mountNode',
+      },
+      behavioursCfg: {
+        highlight: {
+          targetColor: 'yellow',
+          sourceColor: 'blue',
+        },
+      },
+      nodeClick ({id}) {
+        alert(id)
+      } 
+    });
+    //ReGraph.read(formattedData);
+  </script>
+  <script>
+    document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] +
+    ':35729/livereload.js?snipver=1"></' + 'script>')
+  </script> 
+</body>
+</html>
