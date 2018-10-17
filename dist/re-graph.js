@@ -21462,10 +21462,10 @@
     });
   }
 
-  var ReGraph =
+  var Instance =
   /*#__PURE__*/
   function () {
-    _createClass(ReGraph, [{
+    _createClass(Instance, [{
       key: "_getDefaults",
       value: function _getDefaults() {
         return {
@@ -21555,8 +21555,8 @@
       }
     }]);
 
-    function ReGraph(options) {
-      _classCallCheck(this, ReGraph);
+    function Instance(options) {
+      _classCallCheck(this, Instance);
 
       var defaults = this._getDefaults();
 
@@ -21569,7 +21569,7 @@
       this._initEvent();
     }
 
-    _createClass(ReGraph, [{
+    _createClass(Instance, [{
       key: "_createG6Gragh",
       value: function _createG6Gragh() {
         var _this$opts = this.opts,
@@ -21664,7 +21664,7 @@
       }
     }]);
 
-    return ReGraph;
+    return Instance;
   }();
 
   /**
@@ -21705,10 +21705,10 @@
     };
   }
 
-  var reGraph = {
+  var ReGraph = {
     instance: null,
     create: function create(opts) {
-      this.instance = this.instance || new ReGraph(opts);
+      this.instance = this.instance || new Instance(opts);
     },
     read: function read(data) {
       if (this.instance) {
@@ -21725,6 +21725,6 @@
     }
   };
 
-  return reGraph;
+  return ReGraph;
 
 })));

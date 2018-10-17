@@ -8,7 +8,7 @@ import ReLayout from '../layout'
 import initNode from './initNode'
 import highlightRelation from '../behaviour/highlightRelation'
 
-export default class ReGraph {
+export default class Instance {
   _getDefaults () {
     return {
       /**

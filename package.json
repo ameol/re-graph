@@ -1,5 +1,5 @@
 {
-  "name": "re-graph",
+  "name": "@ameol/regraph",
   "version": "0.0.1",
   "description": "",
   "main": "src/index.js",

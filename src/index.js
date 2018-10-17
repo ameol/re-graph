@@ -1,10 +1,10 @@
-import ReGraph from './core/reGraph'
+import Instance from './core'
 import formatData from './utils/formatData'
-// instance是ReGraph实例
-const reGraph = {
+
+const ReGraph = {
   instance: null,
   create (opts) {
-    this.instance = this.instance || new ReGraph(opts)
+    this.instance = this.instance || new Instance(opts)
   },
   read (data) {
     if (this.instance) {
@@ -20,4 +20,4 @@ const reGraph = {
     formatData,
   },
 }
-export default reGraph
+export default ReGraph
