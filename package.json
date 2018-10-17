@@ -1,8 +1,9 @@
 {
   "name": "@ameol/regraph",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "src/index.js",
+  "module": "dist/regraph.js",
   "dependencies": {
     "@antv/g6": "^2.1.1-beta",
     "dagre": "^0.8.2",

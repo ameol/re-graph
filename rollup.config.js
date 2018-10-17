@@ -6,7 +6,7 @@ import postcss from 'rollup-plugin-postcss'
 export default {
   input: 'src/index.js',
   output: {
-    file: 'dist/re-graph.js',
+    file: 'dist/regraph.js',
     name: 'ReGraph',
     format: 'umd',
   },
