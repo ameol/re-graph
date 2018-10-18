@@ -9,7 +9,7 @@
 </head>
 <body>
   <div id="mountNode"></div>
-  <script src="../dist/re-graph.js"></script>
+  <script src="../dist/regraph.js"></script>
   <script>
     //数据格式，可以使用ReGraph.Utils.formatData直接重定义格式
     /*
@@ -60,7 +60,8 @@
       container: 'mountNode',
       height: 600,
       width: 900,
-      data: formattedData,
+      //data: formattedData,
+      //edgeCfg: {},
       minimapCfg: {
         container: 'mountNode',
       },
@@ -68,13 +69,32 @@
         highlight: {
           targetColor: 'yellow',
           sourceColor: 'blue',
+          beforeEnter: (item, graph) => {
+            graph.getEdges().map(it => graph.update(it.id, { color: '#fff' }))
+          },
+          beforeLeave: (item, graph, originColor) => {
+            graph.getEdges().map(it => graph.update(it.id, { color: originColor }))
+          }
         },
       },
       nodeClick ({id}) {
         alert(id)
+      },
+      ToolTipFormatter (model) {
+        const arr = []
+        // 可能存在多条数据，不严谨
+        model.fields.forEach((field) => {
+          const filedRelation = data.find(item => {
+            return String(item.target_table_id) === model.id && item.target_field === field
+          })
+          if(filedRelation)
+            arr.push([field, filedRelation.source_field])
+        })
+        
+        return [['表名', model.label], ...arr]
       } 
     });
-    //ReGraph.read(formattedData);
+    ReGraph.read(formattedData);
   </script>
   <script>
     document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] +

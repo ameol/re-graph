@@ -26,6 +26,40 @@
     return Constructor;
   }
 
+  function _defineProperty(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+
+    return obj;
+  }
+
+  function _objectSpread(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i] != null ? arguments[i] : {};
+      var ownKeys = Object.keys(source);
+
+      if (typeof Object.getOwnPropertySymbols === 'function') {
+        ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
+          return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+        }));
+      }
+
+      ownKeys.forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    }
+
+    return target;
+  }
+
   var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
   function commonjsRequire () {
@@ -21431,20 +21465,26 @@
   function highlightRelation (_ref) {
     var originColor = _ref.originColor,
         targetColor = _ref.targetColor,
-        sourceColor = _ref.sourceColor;
+        sourceColor = _ref.sourceColor,
+        beforeEnter = _ref.beforeEnter,
+        beforeLeave = _ref.beforeLeave;
     G6.registerBehaviour('mouseEnterHighlightRelation', function (graph) {
       graph.behaviourOn('node:mouseenter', function (ev) {
+        if (typeof beforeEnter === 'function') {
+          beforeEnter(ev.item, graph);
+        }
+
         var _ev$item = ev.item,
             edges = _ev$item.edges,
             id = _ev$item.id;
         edges.forEach(function (item) {
-          if (item.target.id === id) {
+          if (item.target.id === id && targetColor) {
             graph.update(item.id, {
               color: targetColor || 'red'
             });
-          } else if (item.source.id === id) {
+          } else if (item.source.id === id && sourceColor) {
             graph.update(item.id, {
-              color: sourceColor || '#FE2EF7'
+              color: sourceColor
             });
           }
         });
@@ -21452,6 +21492,10 @@
     });
     G6.registerBehaviour('mouseLeaveResetRelation', function (graph) {
       graph.behaviourOn('node:mouseleave', function (ev) {
+        if (typeof beforeLeave === 'function') {
+          beforeLeave(ev.item, graph, originColor || '#AAB7C4');
+        }
+
         var edges = ev.item.edges;
         edges.forEach(function (item) {
           graph.update(item.id, {
@@ -21494,10 +21538,13 @@
           height: 0,
 
           /**
-           * 默认是直线，可选：polyline, polyline-round（直角折线，圆角折线）
+           * 默认是直线，type可选：polyline, polyline-round（直角折线，圆角折线）
            * @type {string}
            */
-          edgeType: 'default',
+          edgeCfg: {
+            shape: 'default' // color: '#AAB7C4', //设置颜色节点hover，高亮关系线功能失效
+
+          },
 
           /**
            * 是否支持缩略图
@@ -21539,16 +21586,25 @@
            */
           behavioursCfg: {
             highlight: {
-              originColor: '',
-              // 标示鼠标离开焦点恢复原始颜色，所以一般情况不设置该项
               targetColor: '',
-              sourceColor: ''
+              sourceColor: '',
+              beforeEnter: null,
+              beforeLeave: null
             }
           },
 
           /**
+           * 设置节点tooltip内容
+           * @type {function}
+           * @param model
+           * @param originalData
+           */
+          ToolTipFormatter: null,
+
+          /**
            * 节点点击事件
            * @type {function}
+           * @param item
            */
           nodeClick: null
         };
@@ -21619,21 +21675,20 @@
       key: "_init",
       value: function _init() {
         var _this$opts2 = this.opts,
-            edgeType = _this$opts2.edgeType,
-            data = _this$opts2.data;
+            edgeCfg = _this$opts2.edgeCfg,
+            data = _this$opts2.data,
+            ToolTipFormatter = _this$opts2.ToolTipFormatter;
         initNode();
         this.graph.node({
           shape: 'reNode',
           tooltip: function tooltip(model) {
+            var toolTipArr = typeof ToolTipFormatter === 'function' ? ToolTipFormatter(model) : [[['表名', model.label]]];
             return {
               title: '',
-              list: [['表名', model.label]]
+              list: toolTipArr
             };
           }
         });
-        var edgeCfg = edgeType !== 'default' ? {
-          shape: edgeType
-        } : {};
         this.graph.edge(edgeCfg);
 
         if (data) {
@@ -21655,11 +21710,15 @@
       key: "_initBehaviours",
       value: function _initBehaviours() {
         var highlight = this.opts.behavioursCfg.highlight;
-        highlightRelation(highlight || {});
+        var color = this.opts.edgeCfg.color;
+        highlightRelation(_objectSpread({}, highlight, {
+          originColor: color
+        }) || {});
       }
     }, {
       key: "readData",
       value: function readData(data) {
+        this.data = data;
         this.graph.read(data);
       }
     }]);

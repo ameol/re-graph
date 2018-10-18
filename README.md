@@ -30,10 +30,13 @@ width: 0,
  */
 height: 0,
 /**
- * 默认是直线，可选：polyline, polyline-round（直角折线，圆角折线）
+ * 默认是直线，type可选：polyline, polyline-round（直角折线，圆角折线）
  * @type {string}
  */
-edgeType: 'default',
+edgeCfg: {
+  shape: 'default',
+  // color: '#AAB7C4', //设置颜色节点hover，高亮关系线功能失效
+},
 /**
  * 是否支持缩略图
  * @type {boolean}
@@ -44,9 +47,9 @@ enableMinimap: true,
  * @type {boolean}
  */
 minimapCfg: {
-container: '',
-width: 180,
-height: 120,
+  container: '',
+  width: 180,
+  height: 120,
 },
 /**
  * 是否支持拖拽画布来平移画布
@@ -69,14 +72,23 @@ allowBehaviours: ['mouseEnterHighlightRelation', 'mouseLeaveResetRelation'],
  */
 behavioursCfg: {
   highlight: {
-    originColor: '', // 标示鼠标离开焦点恢复原始颜色，所以一般情况不设置该项
     targetColor: '',
     sourceColor: '',
+    beforeEnter: null, //参数：item, graph
+    beforeLeave: null, // 参数：item, graph, originColor（线原始的颜色）
   },
 },
 /**
- * 节点点击事件，参数是node id
+ * 设置节点tooltip内容
  * @type {function}
+ * @param model
+ * @param originalData
+ */
+ToolTipFormatter: null,
+/**
+ * 节点点击事件
+ * @type {function}
+ * @param item
  */
 nodeClick: null,
 ```

@@ -32,10 +32,13 @@ export default class Instance {
        */
       height: 0,
       /**
-       * 默认是直线，可选：polyline, polyline-round（直角折线，圆角折线）
+       * 默认是直线，type可选：polyline, polyline-round（直角折线，圆角折线）
        * @type {string}
        */
-      edgeType: 'default',
+      edgeCfg: {
+        shape: 'default',
+        // color: '#AAB7C4', //设置颜色节点hover，高亮关系线功能失效
+      },
       /**
        * 是否支持缩略图
        * @type {boolean}
@@ -71,14 +74,23 @@ export default class Instance {
        */
       behavioursCfg: {
         highlight: {
-          originColor: '', // 标示鼠标离开焦点恢复原始颜色，所以一般情况不设置该项
           targetColor: '',
           sourceColor: '',
+          beforeEnter: null,
+          beforeLeave: null,
         },
       },
       /**
+       * 设置节点tooltip内容
+       * @type {function}
+       * @param model
+       * @param originalData
+       */
+      ToolTipFormatter: null,
+      /**
        * 节点点击事件
        * @type {function}
+       * @param item
        */
       nodeClick: null,
     }
@@ -125,18 +137,18 @@ export default class Instance {
   }
 
   _init () {
-    const { edgeType, data } = this.opts
+    const { edgeCfg, data, ToolTipFormatter } = this.opts
     initNode()
     this.graph.node({
       shape: 'reNode',
       tooltip (model) {
+        const toolTipArr = typeof ToolTipFormatter === 'function' ? ToolTipFormatter(model) : [[['表名', model.label]]]
         return {
           title: '',
-          list: [['表名', model.label]],
+          list: toolTipArr,
         }
       },
     })
-    const edgeCfg = edgeType !== 'default' ? { shape: edgeType } : {}
     this.graph.edge(edgeCfg)
     if (data) {
       this.graph.read(data)
@@ -153,10 +165,12 @@ export default class Instance {
 
   _initBehaviours () {
     const { highlight } = this.opts.behavioursCfg
-    highlightRelation(highlight || {})
+    const { color } = this.opts.edgeCfg
+    highlightRelation({ ...highlight, originColor: color } || {})
   }
 
   readData (data) {
+    this.data = data
     this.graph.read(data)
   }
 }
