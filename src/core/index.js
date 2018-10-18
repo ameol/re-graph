@@ -99,6 +99,8 @@ export default class Instance {
   constructor (options) {
     const defaults = this._getDefaults()
     this.opts = deepmerge(defaults, options)
+    this.originalData = []
+    this.data = this.opts.data
     this._createG6Gragh()
     this._init()
     this._initEvent()
@@ -137,22 +139,28 @@ export default class Instance {
   }
 
   _init () {
-    const { edgeCfg, data, ToolTipFormatter } = this.opts
+    const { edgeCfg, data } = this.opts
     initNode()
+    this._updateNodeCfg()
+    this.graph.edge(edgeCfg)
+    if (data) {
+      this.readData(data)
+    }
+  }
+
+  _updateNodeCfg () {
+    const { originalData } = this
+    const { ToolTipFormatter } = this.opts
     this.graph.node({
       shape: 'reNode',
       tooltip (model) {
-        const toolTipArr = typeof ToolTipFormatter === 'function' ? ToolTipFormatter(model) : [[['表名', model.label]]]
+        const toolTipArr = typeof ToolTipFormatter === 'function' ? ToolTipFormatter(model, originalData) : [[['表名', model.label]]]
         return {
           title: '',
           list: toolTipArr,
         }
       },
     })
-    this.graph.edge(edgeCfg)
-    if (data) {
-      this.graph.read(data)
-    }
   }
 
   _initEvent () {
@@ -169,8 +177,10 @@ export default class Instance {
     highlightRelation({ ...highlight, originColor: color } || {})
   }
 
-  readData (data) {
+  readData (data, originalData) {
     this.data = data
+    this.originalData = originalData
+    this._updateNodeCfg()
     this.graph.read(data)
   }
 }

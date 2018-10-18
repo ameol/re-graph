@@ -80,11 +80,11 @@
       nodeClick ({id}) {
         alert(id)
       },
-      ToolTipFormatter (model) {
+      ToolTipFormatter (model, originalData) {
         const arr = []
         // 可能存在多条数据，不严谨
         model.fields.forEach((field) => {
-          const filedRelation = data.find(item => {
+          const filedRelation = originalData.find(item => {
             return String(item.target_table_id) === model.id && item.target_field === field
           })
           if(filedRelation)
@@ -94,7 +94,7 @@
         return [['表名', model.label], ...arr]
       } 
     });
-    ReGraph.read(formattedData);
+    ReGraph.read(formattedData, data);
   </script>
   <script>
     document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] +

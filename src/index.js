@@ -6,9 +6,9 @@ const ReGraph = {
   create (opts) {
     this.instance = this.instance || new Instance(opts)
   },
-  read (data) {
+  read (data, originalData) {
     if (this.instance) {
-      this.instance.readData(data)
+      this.instance.readData(data, originalData)
     }
   },
   destroy () {

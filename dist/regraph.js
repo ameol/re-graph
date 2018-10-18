@@ -21617,6 +21617,8 @@
       var defaults = this._getDefaults();
 
       this.opts = deepmerge_1(defaults, options);
+      this.originalData = [];
+      this.data = this.opts.data;
 
       this._createG6Gragh();
 
@@ -21676,24 +21678,32 @@
       value: function _init() {
         var _this$opts2 = this.opts,
             edgeCfg = _this$opts2.edgeCfg,
-            data = _this$opts2.data,
-            ToolTipFormatter = _this$opts2.ToolTipFormatter;
+            data = _this$opts2.data;
         initNode();
+
+        this._updateNodeCfg();
+
+        this.graph.edge(edgeCfg);
+
+        if (data) {
+          this.readData(data);
+        }
+      }
+    }, {
+      key: "_updateNodeCfg",
+      value: function _updateNodeCfg() {
+        var originalData = this.originalData;
+        var ToolTipFormatter = this.opts.ToolTipFormatter;
         this.graph.node({
           shape: 'reNode',
           tooltip: function tooltip(model) {
-            var toolTipArr = typeof ToolTipFormatter === 'function' ? ToolTipFormatter(model) : [[['表名', model.label]]];
+            var toolTipArr = typeof ToolTipFormatter === 'function' ? ToolTipFormatter(model, originalData) : [[['表名', model.label]]];
             return {
               title: '',
               list: toolTipArr
             };
           }
         });
-        this.graph.edge(edgeCfg);
-
-        if (data) {
-          this.graph.read(data);
-        }
       }
     }, {
       key: "_initEvent",
@@ -21717,8 +21727,12 @@
       }
     }, {
       key: "readData",
-      value: function readData(data) {
+      value: function readData(data, originalData) {
         this.data = data;
+        this.originalData = originalData;
+
+        this._updateNodeCfg();
+
         this.graph.read(data);
       }
     }]);
@@ -21769,9 +21783,9 @@
     create: function create(opts) {
       this.instance = this.instance || new Instance(opts);
     },
-    read: function read(data) {
+    read: function read(data, originalData) {
       if (this.instance) {
-        this.instance.readData(data);
+        this.instance.readData(data, originalData);
       }
     },
     destroy: function destroy() {
